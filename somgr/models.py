@@ -12,7 +12,6 @@ class Project(models.Model):
     endDate = models.DateTimeField(null=True, verbose_name="Date Ended")
     isActivate = models.CharField(blank=False, default='Y', max_length=1)
 
-
     def __str__(self):
         return self.name
 
