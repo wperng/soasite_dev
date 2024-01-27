@@ -6,6 +6,7 @@ class Project(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=500, blank=True)
+    createdBy = models.CharField(max_length=200, verbose_name="Created By")
     emailTitle = models.CharField(max_length=200, verbose_name="Email Title")
     emailContent = models.CharField(max_length=1000, verbose_name="Email Content")
     startDate = models.DateTimeField(verbose_name="Date Started")
