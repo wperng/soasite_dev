@@ -1,0 +1,21 @@
+{% include "header.html" %}  
+
+signoff-form
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>{{ project.name }}</h1></legend>
+        {% if info_message %}<p><strong>{{ info_message }}</strong></p>{% endif %}
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for signoff in project.signoff.all() %}
+            {% if signoff.soby = authenticated user OR signoff.soteam = None %}
+                <input type="radio" name="signoff" id="signoff" value="{{ signoff.soteam }}">
+                <label for="signoff">{{ signoff.soteam }}</label><br>
+            {% endif %}
+        {% endfor %}
+    </fieldset>
+    <input type="submit" value="Vote">
+</form>
+
+{% include "footer.html" %}  
