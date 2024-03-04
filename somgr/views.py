@@ -1,28 +1,35 @@
+from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from somgr.models import Project
+from django.shortcuts import render
+from somgr.models import Project, Signoff
 from somgr import *
 
-@login_required(login_url="/somgr/login.html")
+@login_required(login_url="/somgr/login")
 def index(request):
     latest_project_list = Project.objects.order_by("name")[:10]
     context = {"page_title":page_title, "latest_project_list": latest_project_list}
     return render(request, "index.html", context)
 
-@login_required(login_url="/somgr/login.html")
+@login_required(login_url="/somgr/login")
 def project(request, project_id):
+
     if request.method == "GET": 
-        context ={"page_title":page_title}
+        context ={"page_title":page_title, "project": Project.objects.get(id=project_id)}
         return render(request, "signoffList.html", context)
 
-    if request.method == "POST": 
-        project = get_object_or_404(Project, pk=project_id)
-        selected_signoff = project.signoff_set.get(pk=request.POST["soteam"])
-        selected_signoff.save()
-        context = {"page_title":page_title}
+    if request.method == "POST":
+        try:
+            signoff = Signoff.objects.get(project_id=project_id, soteam=request.POST['soteam'])
+            signoff.soby = "william"
+            signoff.sodate = timezone.now()
+            signoff.save()
+        except Signoff.DoesNotExist:
+            return render(request, "signoffList.html", context)  
+
+        context ={"page_title":page_title, "project": Project.objects.get(id=project_id)}
+     
         return render(request, "signoffList.html", context)  
     
 def login(request):
@@ -33,7 +40,7 @@ def login(request):
     if request.method == "POST":
         username = request.POST['username']
         password=request.POST['password']
-        user=authenticate(request,username=username,password=password)
+        user=authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return HttpResponse("OK")

@@ -1,21 +1,26 @@
 {% include "header.html" %}  
 
-signoff-form
+{% if info_message %}<p><div class="alert alert-success" role="alert">{{ info_message }}</div></p>{% endif %}
+{% if error_message %}<p><div class="alert alert-danger" role="alert">{{ error_message }}</div></p>{% endif %}
 
-<form action="{% url 'polls:vote' question.id %}" method="post">
+<form action="{% url 'somgr:signoff' project.id %}" method="post">
     {% csrf_token %}
     <fieldset>
-        <legend><h1>{{ project.name }}</h1></legend>
-        {% if info_message %}<p><strong>{{ info_message }}</strong></p>{% endif %}
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        {% for signoff in project.signoff.all() %}
-            {% if signoff.soby = authenticated user OR signoff.soteam = None %}
-                <input type="radio" name="signoff" id="signoff" value="{{ signoff.soteam }}">
-                <label for="signoff">{{ signoff.soteam }}</label><br>
+        <legend>{{ project.name }}</legend>
+        {% for signoff in project.signoff_set.all %}
+            <input type="radio" name="soteam" id="signoff{{ forloop.counter }}" value="{{ signoff.soteam }}">
+            <label for="soteam">{{ signoff.soteam }}</label><br>
+            {% if not signoff.soby %}
+                <input type="radio" name="soteam" id="signoff{{ forloop.counter }}" value="{{ signoff.soteam }}">
+                <label for="soteam">123{{ signoff.soteam }}</label><br>
+            {% endif %}
+            {% if signoff.soby == 'william' %}
+                <input type="radio" name="soteam" id="signoff{{ forloop.counter }}" value="{{ signoff.soteam }}">
+                <label for="soteam">Remove</label><br>
             {% endif %}
         {% endfor %}
     </fieldset>
-    <input type="submit" value="Vote">
+    <input type="submit" value="Signoff">
 </form>
 
 {% include "footer.html" %}  
